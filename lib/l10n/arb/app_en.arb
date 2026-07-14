@@ -50,7 +50,7 @@
     "domainsHelp": "example.com",
     "data": "Data",
     "exportFavorites": "Export favorites",
-    "exportFavoritesDescription": "Shares favorites as IDs in JSON format",
+    "exportFavoritesDescription": "Shares favorites as TSV with titles, links and metadata",
     "clearVisited": "Clear read statuses",
     "about": "About",
     "appVersion": "App version",

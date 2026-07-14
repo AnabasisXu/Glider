@@ -104,6 +104,7 @@ class AppContainer {
         settingsRepository,
         packageRepository,
         itemInteractionRepository,
+        itemRepository,
       ),
       StoriesCubit(itemRepository),
       StoriesSearchBloc(itemRepository),

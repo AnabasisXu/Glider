@@ -1,11 +1,11 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:ui';
 
 import 'package:bloc/bloc.dart';
 import 'package:bloc_presentation/bloc_presentation.dart';
 import 'package:equatable/equatable.dart';
 import 'package:glider/common/extensions/bloc_base_extension.dart';
+import 'package:glider/settings/models/favorite_export.dart';
 import 'package:glider_domain/glider_domain.dart';
 import 'package:material_color_utilities/scheme/variant.dart';
 import 'package:pub_semver/pub_semver.dart';
@@ -20,6 +20,7 @@ class SettingsCubit extends Cubit<SettingsState>
     this._settingsRepository,
     this._packageRepository,
     this._itemInteractionRepository,
+    this._itemRepository,
   ) : super(const SettingsState()) {
     unawaited(_load());
   }
@@ -27,6 +28,11 @@ class SettingsCubit extends Cubit<SettingsState>
   final SettingsRepository _settingsRepository;
   final PackageRepository _packageRepository;
   final ItemInteractionRepository _itemInteractionRepository;
+  final ItemRepository _itemRepository;
+
+  /// Number of favorites fetched concurrently when exporting, to bound the
+  /// load placed on the Hacker News API for large favorite collections.
+  static const int _exportBatchSize = 10;
 
   Future<void> _load() async {
     final themeMode = await _settingsRepository.getThemeMode();
@@ -297,10 +303,37 @@ class SettingsCubit extends Cubit<SettingsState>
   }
 
   Future<void> exportFavorites() async {
-    final favorites = await _itemInteractionRepository.favoritedStream.first;
+    final ids = await _itemInteractionRepository.favoritedStream.first;
+    if (ids.isEmpty) return;
 
     try {
-      await Share.share(jsonEncode(favorites));
+      final items = <Item>[];
+      // Fetch item details in bounded batches to avoid hammering the API.
+      for (var start = 0; start < ids.length; start += _exportBatchSize) {
+        final batch = ids.sublist(
+          start,
+          (start + _exportBatchSize).clamp(0, ids.length),
+        );
+        items.addAll(await Future.wait(batch.map(_itemRepository.getItem)));
+      }
+
+      final rows = [
+        for (final item in items)
+          FavoriteExportRow(
+            id: item.id,
+            title: item.title,
+            url: item.url?.toString(),
+            score: item.score,
+            author: item.username,
+            commentCount: item.descendantCount,
+            type: item.type?.name,
+          ),
+      ];
+
+      await Share.share(
+        formatFavoritesAsTsv(rows),
+        subject: 'Glider favorites',
+      );
     } on Object {
       emitPresentation(const SettingsActionFailedEvent());
     }
