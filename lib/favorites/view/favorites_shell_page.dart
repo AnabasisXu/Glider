@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:bloc_presentation/bloc_presentation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:glider/app/container/app_container.dart';
@@ -47,29 +48,40 @@ class _FavoritesShellPageState extends State<FavoritesShellPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      type: MaterialType.transparency,
-      child: RefreshableScrollView(
-        onRefresh: () async => unawaited(widget._favoritesCubit.load()),
-        slivers: [
-          _SliverFavoritesAppBar(
-            widget._favoritesCubit,
-            widget._authCubit,
-            widget._settingsCubit,
+    return BlocPresentationListener<FavoritesCubit, FavoritesCubitEvent>(
+      bloc: widget._favoritesCubit,
+      listener: (context, event) => switch (event) {
+        FavoritesActionFailedEvent() =>
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(context.l10n.failure),
+            ),
           ),
-          SliverSafeArea(
-            top: false,
-            sliver: _SliverFavoritesBody(
+      },
+      child: Material(
+        type: MaterialType.transparency,
+        child: RefreshableScrollView(
+          onRefresh: () async => unawaited(widget._favoritesCubit.load()),
+          slivers: [
+            _SliverFavoritesAppBar(
               widget._favoritesCubit,
-              widget._itemCubitFactory,
               widget._authCubit,
               widget._settingsCubit,
             ),
-          ),
-          const SliverPadding(
-            padding: AppSpacing.floatingActionButtonPageBottomPadding,
-          ),
-        ],
+            SliverSafeArea(
+              top: false,
+              sliver: _SliverFavoritesBody(
+                widget._favoritesCubit,
+                widget._itemCubitFactory,
+                widget._authCubit,
+                widget._settingsCubit,
+              ),
+            ),
+            const SliverPadding(
+              padding: AppSpacing.floatingActionButtonPageBottomPadding,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -92,6 +104,11 @@ class _SliverFavoritesAppBar extends StatelessWidget {
       title: Text(context.l10n.favorites),
       flexibleSpace: AppBarProgressIndicator(_favoritesCubit),
       actions: [
+        IconButton(
+          icon: const Icon(Icons.download_outlined),
+          tooltip: context.l10n.exportFavorites,
+          onPressed: _favoritesCubit.exportFavorites,
+        ),
         BlocBuilder<AuthCubit, AuthState>(
           bloc: _authCubit,
           builder: (context, authState) =>

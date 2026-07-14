@@ -1,6 +1,8 @@
 include: package:leancode_lint/analysis_options.yaml
 
 analyzer:
+  exclude:
+    - lib/l10n/gen/**
   errors:
     included_file_warning: ignore
   plugins:

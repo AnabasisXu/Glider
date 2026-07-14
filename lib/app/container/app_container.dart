@@ -104,7 +104,6 @@ class AppContainer {
         settingsRepository,
         packageRepository,
         itemInteractionRepository,
-        itemRepository,
       ),
       StoriesCubit(itemRepository),
       StoriesSearchBloc(itemRepository),
@@ -121,7 +120,7 @@ class AppContainer {
       (id) => StoryItemSearchBloc(itemRepository, id: id),
       (id) => EditCubit(itemRepository, itemInteractionRepository, id: id),
       (id) => ReplyCubit(itemRepository, itemInteractionRepository, id: id),
-      FavoritesCubit(itemInteractionRepository),
+      FavoritesCubit(itemInteractionRepository, itemRepository),
       InboxCubit(itemRepository, authRepository),
       (username) => UserCubit(
         userRepository,

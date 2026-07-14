@@ -325,11 +325,6 @@ class _SettingsBody extends StatelessWidget {
               ),
             ),
             ListTile(
-              title: Text(context.l10n.exportFavorites),
-              subtitle: Text(context.l10n.exportFavoritesDescription),
-              onTap: _settingsCubit.exportFavorites,
-            ),
-            ListTile(
               title: Text(context.l10n.clearVisited),
               onTap: () async {
                 final confirm = await context.push<bool>(

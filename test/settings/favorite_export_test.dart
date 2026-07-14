@@ -1,5 +1,5 @@
-import 'package:glider/settings/models/favorite_export.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:glider/settings/models/favorite_export.dart';
 
 /// Splits [output] into its lines, dropping only the trailing empty string
 /// that follows the final newline. Unlike `trimRight`, this preserves empty
