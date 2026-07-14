@@ -391,11 +391,11 @@ abstract class AppLocalizations {
   /// **'Export favorites'**
   String get exportFavorites;
 
-  /// No description provided for @exportFavoritesDescription.
+  /// No description provided for @exportFavoritesSuccess.
   ///
   /// In en, this message translates to:
-  /// **'Shares favorites as TSV with titles, links and metadata'**
-  String get exportFavoritesDescription;
+  /// **'Exported to {path}'**
+  String exportFavoritesSuccess(String path);
 
   /// No description provided for @clearVisited.
   ///

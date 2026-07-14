@@ -57,6 +57,12 @@ class _FavoritesShellPageState extends State<FavoritesShellPage> {
               content: Text(context.l10n.failure),
             ),
           ),
+        FavoritesExportedEvent(:final path) =>
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(context.l10n.exportFavoritesSuccess(path)),
+            ),
+          ),
       },
       child: Material(
         type: MaterialType.transparency,

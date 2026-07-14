@@ -157,7 +157,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exportFavorites => 'Export favorites';
 
   @override
-  String get exportFavoritesDescription => 'Shares favorites as TSV with titles, links and metadata';
+  String exportFavoritesSuccess(String path) {
+    return 'Exported to $path';
+  }
 
   @override
   String get clearVisited => 'Clear read statuses';

@@ -2,13 +2,13 @@ import 'dart:async';
 
 import 'package:bloc_presentation/bloc_presentation.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/services.dart';
 import 'package:glider/common/extensions/bloc_base_extension.dart';
 import 'package:glider/common/mixins/data_mixin.dart';
 import 'package:glider/common/models/status.dart';
 import 'package:glider/settings/models/favorite_export.dart';
 import 'package:glider_domain/glider_domain.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
-import 'package:share_plus/share_plus.dart';
 
 part 'favorites_cubit_event.dart';
 part 'favorites_state.dart';
@@ -44,6 +44,15 @@ class FavoritesCubit extends HydratedCubit<FavoritesState>
   /// Number of favorites fetched concurrently when exporting, to bound the
   /// load placed on the Hacker News API for large favorite collections.
   static const int _exportBatchSize = 10;
+
+  /// Platform channel used to hand the export off to native code, which
+  /// writes it to the public Downloads directory.
+  static const MethodChannel _exportChannel =
+      MethodChannel('nl.viter.glider/export');
+
+  /// Fixed export filename. Reusing the same name means external sync tooling
+  /// can rely on a stable path (`Download/glider_favorites.tsv`).
+  static const String _exportFileName = 'glider_favorites.tsv';
 
   late final StreamSubscription<List<int>> _favoriteIdsSubscription;
 
@@ -82,10 +91,14 @@ class FavoritesCubit extends HydratedCubit<FavoritesState>
           ),
       ];
 
-      await Share.share(
-        formatFavoritesAsTsv(rows),
-        subject: 'Glider favorites',
+      final path = await _exportChannel.invokeMethod<String>(
+        'exportToDownloads',
+        <String, String>{
+          'fileName': _exportFileName,
+          'content': formatFavoritesAsTsv(rows),
+        },
       );
+      emitPresentation(FavoritesExportedEvent(path ?? _exportFileName));
     } on Object {
       emitPresentation(const FavoritesActionFailedEvent());
     }
