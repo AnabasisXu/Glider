@@ -52,6 +52,7 @@ android {
         targetSdk flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        manifestPlaceholders['appLabel'] = 'Glider'
     }
 
     signingConfigs {
@@ -67,6 +68,11 @@ android {
         release {
             signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        profile {
+            applicationIdSuffix '.profile'
+            versionNameSuffix '-profile'
+            manifestPlaceholders['appLabel'] = 'Glider Test'
         }
     }
 }
