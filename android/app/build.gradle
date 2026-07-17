@@ -47,7 +47,7 @@ android {
     }
 
     defaultConfig {
-        applicationId 'nl.viter.glider'
+        applicationId 'nl.viter.glider.profile'
         minSdk 21
         targetSdk flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
