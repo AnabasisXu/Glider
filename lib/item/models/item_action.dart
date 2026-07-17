@@ -186,6 +186,8 @@ enum ItemAction<T extends MenuItem<S>, S> implements MenuItem<ItemState> {
           await itemCubit.share(
             valueAction.value(itemCubit)!,
             subject: valueAction != ItemValue.title
+                ? ItemValue.title.value(itemCubit)
+                : null,
           );
         }
       case ItemAction.translateComments:

@@ -89,6 +89,7 @@
     "delete": "Delete",
     "reply": "Reply",
     "select": "Select",
+    "copy": "Copy",
     "share": "Share",
     "translateComments": "Translate comments",
     "title": "Title",
