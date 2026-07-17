@@ -10,6 +10,7 @@ import 'package:glider/l10n/extensions/app_localizations_extension.dart';
 import 'package:glider/settings/cubit/settings_cubit.dart';
 import 'package:glider_domain/glider_domain.dart';
 import 'package:go_router/go_router.dart';
+import 'package:glider/item/widgets/translate_comments_dialog.dart';
 
 enum ItemAction<T extends MenuItem<S>, S> implements MenuItem<ItemState> {
   visit,
@@ -22,7 +23,8 @@ enum ItemAction<T extends MenuItem<S>, S> implements MenuItem<ItemState> {
   reply,
   select,
   copy(options: ItemValue.values),
-  share(options: ItemValue.values);
+  share(options: ItemValue.values),
+  translateComments;
 
   const ItemAction({this.options});
 
@@ -68,6 +70,9 @@ enum ItemAction<T extends MenuItem<S>, S> implements MenuItem<ItemState> {
         !item.isDeleted && item.type != ItemType.job && authState.isLoggedIn,
       ItemAction.select => item.text != null,
       ItemAction.copy || ItemAction.share => true,
+      ItemAction.translateComments => !item.isDeleted &&
+          item.childIds != null &&
+          item.childIds!.isNotEmpty,
     };
   }
 
@@ -90,6 +95,7 @@ enum ItemAction<T extends MenuItem<S>, S> implements MenuItem<ItemState> {
       ItemAction.select => context.l10n.select,
       ItemAction.copy => context.l10n.copy,
       ItemAction.share => context.l10n.share,
+      ItemAction.translateComments => context.l10n.translateComments,
     };
   }
 
@@ -114,6 +120,7 @@ enum ItemAction<T extends MenuItem<S>, S> implements MenuItem<ItemState> {
       ItemAction.select => Icons.select_all_outlined,
       ItemAction.copy => Icons.copy_outlined,
       ItemAction.share => Icons.adaptive.share_outlined,
+      ItemAction.translateComments => Icons.translate_outlined,
     };
   }
 
@@ -179,10 +186,13 @@ enum ItemAction<T extends MenuItem<S>, S> implements MenuItem<ItemState> {
           await itemCubit.share(
             valueAction.value(itemCubit)!,
             subject: valueAction != ItemValue.title
-                ? ItemValue.title.value(itemCubit)
-                : null,
           );
         }
+      case ItemAction.translateComments:
+        await showDialog<void>(
+          context: context,
+          builder: (_) => TranslateCommentsDialog(itemCubit: itemCubit),
+        );
     }
   }
 }
